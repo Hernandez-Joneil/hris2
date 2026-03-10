@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>Online Examination</title>
+
+        <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    </head>
+
+    <body>
+
+        {% include 'applicant_navbar.html' %}
+
+
+        <div class="container mt-5">
+
+        <h2>Applicant Examination</h2>
+
+        <form method="POST" action="/submit_exam" id="examForm">
+
+        <h5>1. What does HTML stand for?</h5>
+
+        <input type="radio" name="q1" value="a"> Hyper Text Markup Language<br>
+        <input type="radio" name="q1" value="b"> High Transfer Machine Language<br>
+        <input type="radio" name="q1" value="c"> Home Tool Markup Language<br>
+
+        <br>
+
+        <h5>2. Which language is used for backend development?</h5>
+
+        <input type="radio" name="q2" value="a"> Python<br>
+        <input type="radio" name="q2" value="b"> HTML<br>
+        <input type="radio" name="q2" value="c"> CSS<br>
+
+        <br>
+
+        <h5>3. What does SQL do?</h5>
+
+        <input type="radio" name="q3" value="a"> Creates graphics<br>
+        <input type="radio" name="q3" value="b"> Manages databases<br>
+        <input type="radio" name="q3" value="c"> Edits videos<br>
+
+        <br>
+
+        <h5>4. Which framework are we using?</h5>
+
+        <input type="radio" name="q4" value="a"> Django<br>
+        <input type="radio" name="q4" value="b"> Flask<br>
+        <input type="radio" name="q4" value="c"> Laravel<br>
+
+        <br>
+
+        <h5>5. What is CRUD?</h5>
+
+        <input type="radio" name="q5" value="a"> Create Read Update Delete<br>
+        <input type="radio" name="q5" value="b"> Code Run Update Delete<br>
+        <input type="radio" name="q5" value="c"> Create Run Upload Download<br>
+
+        <br>
+
+        <button class="btn btn-success" type="submit">Submit Exam</button>
+
+        </form>
+
+        </div>
+
+        <script>
+        document.getElementById('examForm').addEventListener('submit', function(event) {
+            const questions = ['q1', 'q2', 'q3', 'q4', 'q5'];
+            let allAnswered = true;
+            questions.forEach(q => {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                }
+            });
+            if (!allAnswered) {
+                alert('Please answer all questions before submitting.');
+                event.preventDefault();
+            } else {
+                alert('Submitting exam...');
+            }
+        });
+        </script>
+
+    </body>
+</html>

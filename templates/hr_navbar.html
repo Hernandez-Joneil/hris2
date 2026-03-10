@@ -1,0 +1,24 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+
+<div class="container-fluid">
+
+<a class="navbar-brand">HR Management</a>
+
+<div class="navbar-nav">
+
+<a class="nav-link{% if request.endpoint == 'dashboard' %} active{% endif %}" href="/dashboard">Applicants</a>
+
+<a class="nav-link{% if request.endpoint == 'create_exam' %} active{% endif %}" href="/create_exam">Create Exam</a>
+
+<a class="nav-link{% if request.endpoint == 'schedule_exam' %} active{% endif %}" href="/schedule_exam">Schedule Exam</a>
+
+<a class="nav-link{% if request.endpoint == 'logout' %} active{% endif %}" href="/logout">Logout</a>
+
+</div>
+
+</div>
+
+</nav>

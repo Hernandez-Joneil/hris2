@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Applicant Portal</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    </head>
+    <body class="applicant">
+        {% include 'applicant_navbar.html' %}
+        <div class="container mt-5">
+            <h2>Job Application</h2>
+            <form action="/apply" method="POST" enctype="multipart/form-data" id="applicationForm">
+                <div class="mb-3">
+                    <input class="form-control" type="text" name="name" placeholder="Full Name" required>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" type="email" name="email" placeholder="Email" required>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control" type="text" name="phone" placeholder="Phone" required>
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" name="address" placeholder="Address" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label>Upload Resume</label>
+                    <input class="form-control" type="file" name="resume" accept=".pdf,.doc,.docx" required>
+                </div>
+                <button class="btn btn-success" type="submit">Submit Application</button>
+            </form>
+            <hr>
+            <a href="/hr_login" class="btn btn-dark">HR Portal</a>
+        </div>
+        <script>
+            document.getElementById('applicationForm').addEventListener('submit', function(event) {
+                
+                const fileInput = document.querySelector('input[name="resume"]');
+                if (fileInput.files.length === 0) {
+                    alert('Please upload a resume.');
+                    event.preventDefault();
+                } else {
+                    alert('Submitting application...');
+                }
+            });
+        </script>
+    </body>
+</html>

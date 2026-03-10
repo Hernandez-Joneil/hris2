@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<div class="container-fluid">
+<a class="navbar-brand">Hiring System</a>
+<div class="navbar-nav">
+<a class="nav-link{% if request.endpoint == 'index' %} active{% endif %}" href="/">Application</a>
+<a class="nav-link{% if request.endpoint == 'application_status' %} active{% endif %}" href="/application_status">Application Status</a>
+<a class="nav-link{% if request.endpoint == 'exam_portal' %} active{% endif %}" href="/exam_portal">Exam Portal</a>
+</div>
+</div>
+</nav>

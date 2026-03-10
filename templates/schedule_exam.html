@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>Schedule Exam</title>
+
+        <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    </head>
+
+    <body>
+
+        {% include 'hr_navbar.html' %}
+
+        <div class="container mt-5">
+
+        <h2>Schedule Examination</h2>
+
+        <form method="POST" action="/schedule_exam" id="scheduleForm">
+
+        <label>Select Applicant</label>
+        <select class="form-control mb-3" name="applicant_id" required>
+
+        {% for a in applicants %}
+        <option value="{{a[0]}}">{{a[1]}}</option>
+        {% endfor %}
+
+        </select>
+
+
+        <label>Select Exam</label>
+        <select class="form-control mb-3" name="exam_id" required>
+
+        {% for e in exams %}
+        <option value="{{e[0]}}">{{e[1]}}</option>
+        {% endfor %}
+
+        </select>
+
+
+        <label>Exam Date</label>
+        <input class="form-control mb-3"
+        type="date"
+        name="date"
+        required>
+
+
+        <label>Exam Time</label>
+        <input class="form-control mb-3"
+        type="time"
+        name="time"
+        required>
+
+
+        <button class="btn btn-primary" type="submit">
+        Schedule Exam
+        </button>
+
+        <a href="/dashboard" class="btn btn-secondary">
+        Back
+        </a>
+
+        </form>
+
+        </div>
+
+        <script>
+        document.getElementById('scheduleForm').addEventListener('submit', function(event) {
+            const applicant = document.querySelector('select[name="applicant_id"]').value;
+            const exam = document.querySelector('select[name="exam_id"]').value;
+            const date = document.querySelector('input[name="date"]').value;
+            const time = document.querySelector('input[name="time"]').value;
+            if (!applicant || !exam || !date || !time) {
+                alert('Please fill in all fields.');
+                event.preventDefault();
+            } else {
+                alert('Scheduling exam...');
+            }
+        });
+        </script>
+
+    </body>
+</html>
