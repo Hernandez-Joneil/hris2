@@ -1,1 +1,19 @@
-*.pyc  __pycache__/  config.py  .env 
+# Python artifacts
+*.pyc
+__pycache__/
+
+# Virtual environments
+venv/
+.venv/
+
+# Local configuration
+config.py
+.env
+
+# Uploads and generated files
+uploads/
+
+# IDE files
+.vscode/
+.idea/
+
