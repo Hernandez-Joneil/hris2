@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, redirect, session
-from flask_pymysql import MySQL
+from flask import Flask, render_template, request, redirect, session, g
+import pymysql
 import config
 import os
 from werkzeug.utils import secure_filename
@@ -18,7 +18,25 @@ app.config["UPLOAD_FOLDER"] = config.UPLOAD_FOLDER
 if not os.path.exists(app.config["UPLOAD_FOLDER"]):
     os.makedirs(app.config["UPLOAD_FOLDER"])
 
-mysql = MySQL(app)
+
+def get_db():
+    if "db" not in g:
+        g.db = pymysql.connect(
+            host=app.config["MYSQL_HOST"],
+            user=app.config["MYSQL_USER"],
+            password=app.config["MYSQL_PASSWORD"],
+            database=app.config["MYSQL_DB"],
+            cursorclass=pymysql.cursors.Cursor,
+        )
+    return g.db
+
+
+@app.teardown_appcontext
+def close_db(exception=None):
+    db = g.pop("db", None)
+    if db is not None:
+        db.close()
+
 
 @app.route("/")
 def home():
@@ -43,14 +61,14 @@ def apply():
 
     resume.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
     cur.execute(
-    "INSERT INTO applicants(name,email,phone,address,resume,status) VALUES(%s,%s,%s,%s,%s,%s)",
-    (name,email,phone,address,filename,"Pending")
+        "INSERT INTO applicants(name,email,phone,address,resume,status) VALUES(%s,%s,%s,%s,%s,%s)",
+        (name, email, phone, address, filename, "Pending"),
     )
 
-    mysql.connection.commit()
+    get_db().commit()
 
     return "Application Submitted"
 
@@ -63,11 +81,11 @@ def hr_login():
         email = request.form["email"]
         password = request.form["password"]
 
-        cur = mysql.connection.cursor()
+        cur = get_db().cursor()
 
         cur.execute(
-        "SELECT * FROM hr_users WHERE email=%s AND password=%s",
-        (email,password)
+            "SELECT * FROM hr_users WHERE email=%s AND password=%s",
+            (email, password),
         )
 
         user = cur.fetchone()
@@ -86,7 +104,7 @@ def dashboard():
     if "hr" not in session:
         return redirect("/hr_login")
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
     cur.execute("""
         SELECT applicants.id, applicants.name, applicants.email,
         applicants.status, applicants.resume
@@ -104,14 +122,14 @@ def create_exam():
         description = request.form["description"]
         code = request.form["code"]
 
-        cur = mysql.connection.cursor()
+        cur = get_db().cursor()
 
         cur.execute(
-        "INSERT INTO exams(title,description,exam_code) VALUES(%s,%s,%s)",
-        (title,description,code)
+            "INSERT INTO exams(title,description,exam_code) VALUES(%s,%s,%s)",
+            (title, description, code),
         )
 
-        mysql.connection.commit()
+        get_db().commit()
 
         return redirect("/dashboard")
 
@@ -121,7 +139,7 @@ def create_exam():
 @app.route("/schedule_exam", methods=["GET","POST"])
 def schedule_exam():
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
     if request.method == "POST":
 
@@ -130,11 +148,11 @@ def schedule_exam():
         date = request.form["date"]  # Fixed: Changed from "exam_date" to "date" to match form
 
         cur.execute(
-        "INSERT INTO exam_schedule(applicant_id,exam_id,exam_date) VALUES(%s,%s,%s)",
-        (applicant,exam,date)
+            "INSERT INTO exam_schedule(applicant_id,exam_id,exam_date) VALUES(%s,%s,%s)",
+            (applicant, exam, date),
         )
 
-        mysql.connection.commit()
+        get_db().commit()
 
         return redirect("/dashboard")
 
@@ -160,17 +178,17 @@ def exam_login():
     email = request.form["email"]
     code = request.form["code"]
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
     cur.execute(
-    """
-    SELECT applicants.name, exams.title
-    FROM applicants
-    INNER JOIN exam_schedule ON applicants.id = exam_schedule.applicant_id
-    INNER JOIN exams ON exams.id = exam_schedule.exam_id
-    WHERE applicants.email=%s AND exams.exam_code=%s
-    """,
-    (email,code)
+        """
+        SELECT applicants.name, exams.title
+        FROM applicants
+        INNER JOIN exam_schedule ON applicants.id = exam_schedule.applicant_id
+        INNER JOIN exams ON exams.id = exam_schedule.exam_id
+        WHERE applicants.email=%s AND exams.exam_code=%s
+        """,
+        (email, code),
     )
 
     data = cur.fetchone()
@@ -208,15 +226,15 @@ def submit_exam():
 
     result = "Passed" if score >= 3 else "Failed"
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
     # Note: Hardcoded applicant_id=1; replace with session or form data for real use
     cur.execute(
-    "INSERT INTO exam_results(applicant_id,score,result) VALUES(%s,%s,%s)",
-    (1,score,result)
+        "INSERT INTO exam_results(applicant_id,score,result) VALUES(%s,%s,%s)",
+        (1, score, result),
     )
 
-    mysql.connection.commit()
+    get_db().commit()
 
     return f"Your Score: {score}/5 - {result}"
 
@@ -231,11 +249,11 @@ def application_status():
 
         email = request.form["email"]
 
-        cur = mysql.connection.cursor()
+        cur = get_db().cursor()
 
         cur.execute(
-        "SELECT status FROM applicants WHERE email=%s",
-        (email,)
+            "SELECT status FROM applicants WHERE email=%s",
+            (email,),
         )
 
         result = cur.fetchone()
@@ -258,14 +276,14 @@ def logout():
 @app.route("/update_status/<id>/<status>")
 def update_status(id,status):
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
     cur.execute(
-    "UPDATE applicants SET status=%s WHERE id=%s",
-    (status,id)
+        "UPDATE applicants SET status=%s WHERE id=%s",
+        (status, id),
     )
 
-    mysql.connection.commit()
+    get_db().commit()
 
     return redirect("/dashboard")
 
@@ -273,11 +291,11 @@ def update_status(id,status):
 @app.route("/delete_applicant/<id>")
 def delete_applicant(id):
 
-    cur = mysql.connection.cursor()
+    cur = get_db().cursor()
 
-    cur.execute("DELETE FROM applicants WHERE id=%s",(id,))
+    cur.execute("DELETE FROM applicants WHERE id=%s", (id,))
 
-    mysql.connection.commit()
+    get_db().commit()
 
     return redirect("/dashboard")
 
