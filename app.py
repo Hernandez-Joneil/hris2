@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, session
-from flask_mysqldb import MySQL
+from flask_pymysql import MySQL
 import config
 import os
 from werkzeug.utils import secure_filename
@@ -7,7 +7,7 @@ from flask import send_from_directory
 
 app = Flask(__name__)
 
-app.secret_key = "secretkey"
+app.secret_key = os.getenv("SECRET_KEY", "secretkey")
 
 app.config["MYSQL_HOST"] = config.MYSQL_HOST
 app.config["MYSQL_USER"] = config.MYSQL_USER

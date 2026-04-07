@@ -26,13 +26,15 @@ HRIS2 is a Flask-based hiring and applicant tracking system with applicant exam 
    if not os.path.exists(UPLOAD_FOLDER):
        os.makedirs(UPLOAD_FOLDER)
    ```
-4. Set environment variables for production or Render:
-   - `MYSQL_HOST`
-   - `MYSQL_USER`
-   - `MYSQL_PASSWORD`
-   - `MYSQL_DB`
-   - `UPLOAD_FOLDER` (optional)
-   - `SECRET_KEY`
+4. Set environment variables for production or Render with actual database values:
+   - `MYSQL_HOST` = your MySQL host
+   - `MYSQL_USER` = your database user
+   - `MYSQL_PASSWORD` = your database password
+   - `MYSQL_DB` = your database name
+   - `SECRET_KEY` = a random session secret
+   - `UPLOAD_FOLDER` = `uploads` (optional)
+
+   Do not leave `MYSQL_HOST` as `your_mysql_host`.
 
 5. Run locally:
    ```bash
